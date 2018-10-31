@@ -15,19 +15,16 @@ public class TSP {
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
         importData();
-        printData(matrix);
+        //printData(matrix);
         int[][] mst = minimumSpanningTree();
-        printData(mst);
+        //printData(mst);
         int[] path = travelTree();
         int[] prunedPath = prunePath(path);
         printPath(prunedPath);
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        System.out.println(elapsedTime);
     }
 
     public static void importData() {
-        File f = new File("src/test.txt");
+        File f = new File("src/input.txt");
         Scanner sc = null;
         try {
             sc = new Scanner(f);
@@ -60,7 +57,7 @@ public class TSP {
         }
         edges = new HashSet<>();
         Random r = new Random();
-        firstVertex = 2;//r.nextInt(n); //6;
+        firstVertex = 9; //r.nextInt(n); //6;
         covered.add(firstVertex);
         while (covered.size() < n) {
             int[] tuple = Utils.min(matrix, covered);
@@ -79,16 +76,7 @@ public class TSP {
     }
 
     public static int[] travelTree() {
-        ArrayList<Node> nodesLeft = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-            nodesLeft.add(nodes[i]);
-        }
-        ArrayList<Edge> edgesLeft = new ArrayList<>(2 * edges.size());
-        for (Edge e : edges) { //we add them twice and will pop them each time we visit an edge
-            edgesLeft.add(e);
-            edgesLeft.add(e);
-        }
-        int[] path = new int[2 * n]; //we visit each edge  two times.
+        int[] path = new int[2 * edges.size()]; //we visit each edge  two times.
         path[0] = firstVertex;
         path = depthSearch(path, 1, nodes[firstVertex]);
         return path;
@@ -97,12 +85,17 @@ public class TSP {
     public static int[] depthSearch(int[] path, int length, Node actualNode) {
         int minimumDistance = Integer.MAX_VALUE;
         int lessVisitedEdge = 0;
+        for (Edge e : actualNode.edges) { //measures where is the bar (which are the less visited edges)
+            if (e.visitsLeft == 2) {
+                lessVisitedEdge = 2;
+                break;
+            } else if (e.visitsLeft == 1) lessVisitedEdge = 1;
+        }
         Edge bestEdge = null;
         for (Edge e : actualNode.edges) {
-            if (minimumDistance >= e.distance && e.visitsLeft >= lessVisitedEdge) {
+            if (minimumDistance >= e.distance && e.visitsLeft == lessVisitedEdge) {
                 minimumDistance = e.distance;
                 bestEdge = e;
-                lessVisitedEdge = e.visitsLeft;
             }
         }
         bestEdge.visitsLeft--;

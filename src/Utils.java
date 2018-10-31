@@ -52,4 +52,8 @@ class Edge{
         A = TSP.nodes[linkedNode];
         B = TSP.nodes[newNode];
     }
+    @Override
+    public String toString(){
+        return A.index + "---" + B.index;
+    }
 }
